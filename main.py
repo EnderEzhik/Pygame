@@ -1,16 +1,24 @@
 import pygame
 import sys
+import os
 from random import randint
 
 
 size = width, height = [800, 800]
-player_image_path = "C:\\Users\\Acher\\Documents\\Python\\Yandex\\2 years\\Projects\\Pygame\\Assets\\player.png"
-enemy_image_path = "C:\\Users\\Acher\\Documents\\Python\\Yandex\\2 years\\Projects\\Pygame\\Assets\\enemy.png"
+player_image_path = os.getcwd() + "\\Assets\\player.png"
+enemy_image_path = os.getcwd() + "\\Assets\\enemy.png"
 plr = pygame.sprite.Group()
-text = None
 PAUSE = True
 cur_count = 0
 max_count = 0
+if os.path.isfile(os.getcwd() + "\\Assets\\max_count.txt"):
+    f = open(os.getcwd() + "\\Assets\\max_count.txt")
+    max_count = int(f.readline())
+    f.close()
+else:
+    f = open(os.getcwd() + "\\Assets\\max_count.txt", "a")
+    f.write(str(max_count))
+    f.close()
 enemy_speed = 5
 
 class Player(pygame.sprite.Sprite):
@@ -73,7 +81,8 @@ class Enemys(Enemy):
         while i < len(self.enemys):
             if pygame.sprite.spritecollideany(self.enemys[i], plr):
                 PAUSE = True
-                max_count = cur_count
+                if cur_count > max_count:
+                    max_count = cur_count
                 break
             elif self.enemys[i].rect.top + self.enemys[i].rect.height > height:
                 self.enemys.pop(i)
@@ -96,9 +105,8 @@ class Enemys(Enemy):
 
 
 def start():
-    global PAUSE, cur_count
+    global PAUSE, cur_count, text
     pygame.init()
-    text = pygame.font.SysFont("Consolas", 32).render("Управление стрелками", True, pygame.color.Color("White"))
     screen = pygame.display.set_mode(size)
     bg_color = (0, 0, 0)
     clock = pygame.time.Clock()
@@ -111,6 +119,9 @@ def start():
         if PAUSE:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    f = open(os.getcwd() + "\\Assets\\max_count.txt", "w")
+                    f.write(str(max_count))
+                    f.close()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     PAUSE = False
@@ -118,12 +129,33 @@ def start():
                 player.reset()
                 enemys.destroys()
                 screen.fill(bg_color)
+
+                text = pygame.font.SysFont("Consolas", 32).render("Игра \"Уклонись если сможешь\"", True, pygame.color.Color("White"))
+                screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1] * 6 - 50))
+
+                text = pygame.font.SysFont("Consolas", 20).render("Тебе предстоит уклоняться зеленым кубиком снизу", True, pygame.color.Color("White"))
+                screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1] * 5 - 40))
+
+                text = pygame.font.SysFont("Consolas", 20).render("от падающих красных кубиков сверху", True, pygame.color.Color("White"))
+                screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1] * 4 - 30))
+
+                text = pygame.font.SysFont("Consolas", 20).render("скорость падения которых всё время растет", True, pygame.color.Color("White"))
+                screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1] * 3 - 20))
+
+                text = pygame.font.SysFont("Consolas", 20).render("Управление происходит при помощи стрелок", True, pygame.color.Color("White"))
+                screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1] * 2 - 10))
+
+                text = pygame.font.SysFont("Consolas", 20).render("Чтобы начать игру нажми любую клавишу", True, pygame.color.Color("White"))
                 screen.blit(text, (width // 2 - text.get_rect().centerx, height // 2 - text.get_rect().center[1]))
+
                 pygame.display.flip()
                 clock.tick(30)
         else:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    f = open(os.getcwd() + "\\Assets\\max_count.txt", "w")
+                    f.write(str(max_count))
+                    f.close()
                     sys.exit()
                 elif event.type == MYEVENTTYPE:
                     enemys.add()
